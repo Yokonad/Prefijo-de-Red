@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Direcciones IP</title>
+    <link rel="stylesheet" href="modelo.css"> 
+</head>
+<body>
+    <div class="fondo-imagen">
+        <div class="container">
+            <h1>Calculadora de Direcciones IP</h1>
+            <label for="cidr">Ingresa el prefijo de Red:</label>
+            <input type="number" id="cidr" placeholder="Ejemplo: 24" min="0" max="32">
+            <button onclick="calcular()">Calcular</button>
+
+            <div id="resultados" class="resultados"></div>
+        </div>
+    </div>
+    <script src="script.js"></script> 
+</body>
+</html>
