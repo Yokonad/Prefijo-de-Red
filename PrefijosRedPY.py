@@ -1,6 +1,4 @@
 import ipaddress
-import tkinter as tk
-from tkinter import messagebox
 
 def calcular_ips(prefijo):
     try:
@@ -14,10 +12,17 @@ def calcular_ips(prefijo):
     mascara_decimal = str(red.netmask)
     mascara_binaria = '.'.join(format(int(octeto), '08b') for octeto in mascara_decimal.split('.'))
 
+    # Calcular Wildcard Mask
+    octetos_mascara = [int(octeto) for octeto in mascara_decimal.split('.')]
+    wildcard_decimal = '.'.join(str(255 - octeto) for octeto in octetos_mascara)
+    wildcard_binaria = '.'.join(format(255 - int(octeto), '08b') for octeto in mascara_decimal.split('.'))
+
     return {
         "Prefijo CIDR": f"/{prefijo}",
         "Máscara (Decimal)": mascara_decimal,
         "Máscara (Binario)": mascara_binaria,
+        "Wildcard (Decimal)": wildcard_decimal,
+        "Wildcard (Binario)": wildcard_binaria,
         "Total de IPs": total_ips,
         "IPs Utilizables": utilizables,
         "Reservadas (Red + Broadcast)": reservadas,
@@ -25,48 +30,24 @@ def calcular_ips(prefijo):
 
 def mostrar_resultados():
     try:
-        prefijo = int(entry_prefijo.get())
+        prefijo = int(input("Ingresa el prefijo CIDR (por ejemplo, 24 para /24): "))
         if not (0 < prefijo <= 32):
-            raise ValueError
+            raise ValueError("El prefijo debe estar entre 1 y 32.")
+
         resultado = calcular_ips(prefijo)
         if resultado:
-            for widget in frame_resultados.winfo_children():
-                widget.destroy()
-
-            for i, (clave, valor) in enumerate(resultado.items()):
-                texto = f"{clave}: {valor}"
-                tk.Label(frame_resultados, text=texto, font=("Arial", 12), anchor="w", bg="white").pack(
-                    anchor="w", padx=10, pady=5
-                )
+            print("\nResultados:")
+            for clave, valor in resultado.items():
+                print(f"{clave}: {valor}")
         else:
-            messagebox.showerror("Error", "Prefijo inválido. Intenta con un número entre 1 y 32.")
-    except ValueError:
-        messagebox.showerror("Error", "Por favor, ingresa un número válido entre 1 y 32.")
+            print("Prefijo inválido. Intenta con un número entre 1 y 32.")
+    except ValueError as e:
+        print(f"Error: {e}")
 
-root = tk.Tk()
-root.title("Calculadora de Direcciones IP")
-root.geometry("600x450")
-root.resizable(False, False)
-root.configure(bg="#f2f2f2")
-
-titulo = tk.Label(root, text="Calculadora de Direcciones IP", font=("Arial", 16, "bold"), bg="#f2f2f2", pady=10)
-titulo.pack()
-
-instruccion = tk.Label(root, text="Ingresa el prefijo CIDR (por ejemplo, 24 para /24):", font=("Arial", 12), bg="#f2f2f2")
-instruccion.pack(pady=5)
-
-entry_prefijo = tk.Entry(root, font=("Arial", 14), justify="center", width=10)
-entry_prefijo.pack(pady=5)
-
-btn_calcular = tk.Button(
-    root, text="Calcular", command=mostrar_resultados, font=("Arial", 12), bg="#4CAF50", fg="white", padx=20, pady=5
-)
-btn_calcular.pack(pady=10)
-
-frame_container = tk.Frame(root, bd=2, relief="solid", bg="black", padx=2, pady=2)
-frame_container.pack(fill="both", expand=True, padx=20, pady=10)
-
-frame_resultados = tk.Frame(frame_container, bg="white", padx=10, pady=10)
-frame_resultados.pack(fill="both", expand=True)
-
-root.mainloop()
+if __name__ == "__main__":
+    while True:
+        mostrar_resultados()
+        continuar = input("\n¿Quieres calcular otro prefijo? (s/n): ").strip().lower()
+        if continuar != 's':
+            print("\nGracias por usar la calculadora de direcciones IP. ¡Hasta luego!")
+            break
